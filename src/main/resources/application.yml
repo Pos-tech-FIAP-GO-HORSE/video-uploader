@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  sql:
+    init:
+      mode: always
+aws:
+  s3:
+    bucket-name: "seu-bucket-s3"
+    region: "us-east-1"
+    access-key: "AKIA4MZS7NVAPIK2SPFG"
+    secret-key: "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"
