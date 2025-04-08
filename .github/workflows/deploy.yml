@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: ''
+          distribution: 'temurin'
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -63,4 +63,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name process-video-lambda \
-            --zip-file fileb://build/libs/video-processing-app.jar
+            --zip-file fileb://lambda-jar/video-processing-app.jar
