@@ -62,6 +62,8 @@ jobs:
 
       - name: Deploy Lambda Function
         run: |
+          JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
+          echo "Deploying $JAR_FILE to Lambda"
           aws lambda update-function-code \
             --function-name process-video-lambda \
-            --zip-file fileb://lambda-jar/videoupload-0.0.1-SNAPSHOT.jar
+            --zip-file fileb://$JAR_FILE
