@@ -21,22 +21,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Give permission to Gradle wrapper
-        run: chmod +x gradlew
+      - name: Grant execute permission for Gradle Wrapper
+        run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build
+
+      - name: List JARs
+        run: ls -lh build/libs
 
       - name: Upload Lambda Artifact
-        uses: actions/upload-artifact@v4.0.0
+        uses: actions/upload-artifact@v4
         with:
           name: lambda-jar
           path: build/libs/*.jar
@@ -52,6 +47,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-jar
+          path: lambda-jar
+
+      - name: List downloaded artifact
+        run: ls -lh lambda-jar
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -63,7 +62,7 @@ jobs:
       - name: Deploy Lambda Function
         run: |
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
-          echo "Deploying $JAR_FILE to Lambda"
+          echo "Deploying $JAR_FILE"
           aws lambda update-function-code \
             --function-name process-video-lambda \
             --zip-file fileb://$JAR_FILE
