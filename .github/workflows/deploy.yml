@@ -72,12 +72,9 @@ jobs:
 
       - name: Upload JAR para o S3
         run: |
-          cd /home/runner/work/video-uploader/video-uploader/lambda-jar
-          mkdir -p lambda-jar
-          ./gradlew clean bootJar
-          cp build/libs/*-plain.jar lambda-jar/
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
           aws s3 cp "$JAR_FILE" s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
+      
 
       - name: Verifica se a função Lambda existe
         id: check-lambda
