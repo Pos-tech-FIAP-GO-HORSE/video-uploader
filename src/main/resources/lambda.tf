@@ -27,12 +27,12 @@ resource "aws_lambda_function" "process_video_lambda" {
   function_name = "process-video-lambda"
   runtime       = "java11"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "com.example.videoprocessing.lambda.LambdaHandler::handleRequest"
+  handler       = "br.com.postech.videoupload.lambda.LambdaHandler::handleRequest"
   filename      = "build/libs/video-processing-app.jar"
 
   environment {
     variables = {
-      BUCKET_NAME = "video-processing-bucket"
+      BUCKET_NAME = "postech-fiap-video-uploader-001"
     }
   }
 

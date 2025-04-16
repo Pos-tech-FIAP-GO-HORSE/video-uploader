@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'br.com.postech.videouploader'
+group = 'br.com.postech.videoupload'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -35,12 +35,22 @@ dependencies {
     testImplementation("org.springframework:spring-test") // Suporte para testes Spring
 }
 
-tasks.withType(Jar) {
+// Desabilita o bootJar (não usamos aplicação web standalone)
+bootJar {
+    enabled = false
+}
+
+// Habilita o jar padrão
+jar {
+    enabled = true
     manifest {
-        attributes 'Main-Class': 'br.com.postech.videouploader.videoupload.lambda.LambdaHandler' // Classe principal do Lambda
+        attributes(
+                'Main-Class': 'br.com.postech.videoupload.lambda.LambdaHandler'
+        )
     }
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
 }
