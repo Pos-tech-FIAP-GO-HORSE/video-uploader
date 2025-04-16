@@ -1,4 +1,4 @@
-package br.com.postech.videouploader.videoupload.infra.s3
+package br.com.postech.videouploader.infra.s3
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

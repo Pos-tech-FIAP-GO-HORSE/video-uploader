@@ -1,6 +1,7 @@
 package br.com.postech.videouploader.videoupload.presentation.controller
 
-import br.com.postech.videouploader.videoupload.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videouploader.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videouploader.controller.VideoController
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired

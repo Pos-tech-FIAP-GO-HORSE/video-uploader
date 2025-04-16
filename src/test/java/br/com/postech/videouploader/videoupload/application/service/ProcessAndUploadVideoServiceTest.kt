@@ -1,8 +1,9 @@
 package br.com.postech.videouploader.videoupload.application.service
 
-import br.com.postech.videouploader.videoupload.domain.model.Video
-import br.com.postech.videouploader.videoupload.domain.repository.VideoRepository
-import br.com.postech.videouploader.videoupload.infra.s3.S3Uploader
+import br.com.postech.videouploader.application.service.ProcessAndUploadVideoService
+import br.com.postech.videouploader.domain.model.Video
+import br.com.postech.videouploader.domain.repository.VideoRepository
+import br.com.postech.videouploader.infra.s3.S3Uploader
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*

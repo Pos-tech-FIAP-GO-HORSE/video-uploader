@@ -1,9 +1,9 @@
-package br.com.postech.videouploader.videoupload.application.service
+package br.com.postech.videouploader.application.service
 
-import br.com.postech.videouploader.videoupload.application.usecase.ProcessAndUploadVideoUseCase
-import br.com.postech.videouploader.videoupload.domain.model.Video
-import br.com.postech.videouploader.videoupload.domain.repository.VideoRepository
-import br.com.postech.videouploader.videoupload.infra.s3.S3Uploader
+import br.com.postech.videouploader.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videouploader.domain.model.Video
+import br.com.postech.videouploader.domain.repository.VideoRepository
+import br.com.postech.videouploader.infra.s3.S3Uploader
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*

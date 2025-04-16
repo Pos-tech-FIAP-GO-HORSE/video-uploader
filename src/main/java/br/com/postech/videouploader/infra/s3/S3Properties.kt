@@ -1,4 +1,4 @@
-package br.com.postech.videouploader.videoupload.infra.s3
+package br.com.postech.videouploader.infra.s3
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

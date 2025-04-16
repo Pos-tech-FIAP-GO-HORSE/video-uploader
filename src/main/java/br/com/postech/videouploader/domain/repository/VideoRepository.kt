@@ -1,6 +1,6 @@
-package br.com.postech.videouploader.videoupload.domain.repository
+package br.com.postech.videouploader.domain.repository
 
-import br.com.postech.videouploader.videoupload.domain.model.Video
+import br.com.postech.videouploader.domain.model.Video
 import java.util.*
 
 interface VideoRepository {

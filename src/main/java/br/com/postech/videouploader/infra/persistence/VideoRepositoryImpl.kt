@@ -1,8 +1,8 @@
-package br.com.postech.videouploader.videoupload.infra.persistence
+package br.com.postech.videouploader.infra.persistence
 
-import br.com.postech.videouploader.videoupload.domain.model.Video
-import br.com.postech.videouploader.videoupload.domain.repository.VideoRepository
-import br.com.postech.videouploader.videoupload.infra.persistence.entity.VideoEntity
+import br.com.postech.videouploader.domain.model.Video
+import br.com.postech.videouploader.domain.repository.VideoRepository
+import br.com.postech.videouploader.infra.persistence.entity.VideoEntity
 import org.springframework.stereotype.Repository
 import java.util.*
 

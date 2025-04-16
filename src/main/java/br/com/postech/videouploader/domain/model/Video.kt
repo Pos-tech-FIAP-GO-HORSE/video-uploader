@@ -1,4 +1,4 @@
-package br.com.postech.videouploader.videoupload.domain.model
+package br.com.postech.videouploader.domain.model
 
 import java.time.LocalDateTime
 import java.util.*

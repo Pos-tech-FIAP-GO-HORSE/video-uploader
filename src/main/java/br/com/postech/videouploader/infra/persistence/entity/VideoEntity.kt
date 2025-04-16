@@ -1,4 +1,4 @@
-package br.com.postech.videouploader.videoupload.infra.persistence.entity
+package br.com.postech.videouploader.infra.persistence.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

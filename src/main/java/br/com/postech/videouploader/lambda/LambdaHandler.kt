@@ -1,6 +1,6 @@
-package br.com.postech.videouploader.videoupload.lambda
+package br.com.postech.videouploader.lambda
 
-import br.com.postech.videouploader.videoupload.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videouploader.application.usecase.ProcessAndUploadVideoUseCase
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.springframework.context.annotation.AnnotationConfigApplicationContext

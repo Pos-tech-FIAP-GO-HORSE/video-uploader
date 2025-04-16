@@ -1,4 +1,4 @@
-package br.com.postech.videouploader.videoupload.application.usecase
+package br.com.postech.videouploader.application.usecase
 
 import java.time.LocalDateTime
 import java.util.*

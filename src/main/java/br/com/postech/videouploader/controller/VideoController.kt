@@ -1,6 +1,6 @@
-package br.com.postech.videouploader.videoupload.presentation.controller
+package br.com.postech.videouploader.controller
 
-import br.com.postech.videouploader.videoupload.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videouploader.application.usecase.ProcessAndUploadVideoUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
