@@ -60,6 +60,7 @@ jobs:
         id: jar
         run: |
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
+          echo $JAR_FILE
           echo "jar=$JAR_FILE" >> $GITHUB_OUTPUT
 
       - name: Instalar tree e listar diretórios
