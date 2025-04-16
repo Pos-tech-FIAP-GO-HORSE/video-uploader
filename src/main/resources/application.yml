@@ -15,9 +15,3 @@ spring:
   sql:
     init:
       mode: always
-aws:
-  s3:
-    bucket-name: "seu-bucket-s3"
-    region: "us-east-1"
-    access-key: "AKIA4MZS7NVAPIK2SPFG"
-    secret-key: "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"
