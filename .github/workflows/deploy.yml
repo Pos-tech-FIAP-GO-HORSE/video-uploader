@@ -2,11 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
@@ -21,14 +19,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission for Gradle Wrapper
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      - name: List JARs
-        run: ls -lh build/libs
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Upload Lambda Artifact
         uses: actions/upload-artifact@v4
@@ -47,19 +50,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-jar
-          path: lambda-jar
 
-      - name: List downloaded artifact
-        run: ls -lh lambda-jar
-
-      - name: Configure AWS credentials
+      - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Upload to S3
+      - name: Create S3 bucket if it doesn't exist
+        run: |
+          aws s3api head-bucket --bucket ${{ secrets.S3_BUCKET_NAME }} 2>/dev/null || \
+          aws s3api create-bucket --bucket ${{ secrets.S3_BUCKET_NAME }} --region us-east-1
+
+      - name: Upload jar to S3
         run: |
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
           aws s3 cp $JAR_FILE s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
