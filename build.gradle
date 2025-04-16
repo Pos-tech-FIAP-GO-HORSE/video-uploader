@@ -35,22 +35,14 @@ dependencies {
     testImplementation("org.springframework:spring-test") // Suporte para testes Spring
 }
 
-// Desabilita o bootJar (não usamos aplicação web standalone)
-bootJar {
-    enabled = false
+springBoot {
+    mainClass = 'br.com.postech.videoupload.lambda.LambdaHandler'
 }
 
-// Habilita o jar padrão
-jar {
+bootJar {
     enabled = true
-    manifest {
-        attributes(
-                'Main-Class': 'br.com.postech.videoupload.lambda.LambdaHandler'
-        )
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
+jar {
+    enabled = false
 }
