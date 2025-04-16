@@ -63,7 +63,6 @@ jobs:
           echo "jar=$JAR_FILE" >> $GITHUB_OUTPUT
 
       - name: Upload JAR para o S3
-        working-directory: lambda
         run: |
           cd /home/runner/work/videouploader/videoupload/lambda
           mkdir -p lambda-jar
