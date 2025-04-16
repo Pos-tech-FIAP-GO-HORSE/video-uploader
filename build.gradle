@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.9.24'
     id 'org.springframework.boot' version '3.4.4'
@@ -37,13 +38,27 @@ dependencies {
 }
 
 springBoot {
-    mainClass = 'br.com.postech.videoupload.lambda.LambdaHandler'
+    mainClass.set("br.com.postech.videoupload.lambda.LambdaHandler")
 }
 
 bootJar {
-    enabled = true
+    enabled = false
 }
 
 jar {
-    enabled = false
+    enabled = true
 }
+
+tasks {
+
+    shadowJar {
+        archiveBaseName.set("lambda")
+        archiveClassifier.set("") // importante para gerar lambda.jar (sem -all)
+        mergeServiceFiles()
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
