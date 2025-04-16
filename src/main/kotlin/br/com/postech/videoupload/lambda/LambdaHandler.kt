@@ -1,18 +1,24 @@
 package br.com.postech.videoupload.lambda
 
 import br.com.postech.videoupload.application.usecase.ProcessAndUploadVideoUseCase
-import br.com.postech.videoupload.infra.config.AppConfig
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.EnableAspectJAutoProxy
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
 
-
+@SpringBootApplication
+@ComponentScan(basePackages = ["br.com.postech.videoupload"])
+@EnableAspectJAutoProxy(proxyTargetClass = false) // Se você estiver usando AOP
 class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
-    val applicationContext = AnnotationConfigApplicationContext(AppConfig::class.java)
+    private val applicationContext: ApplicationContext = SpringApplicationBuilder(LambdaHandler::class.java).run()
+
     private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
         applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
 

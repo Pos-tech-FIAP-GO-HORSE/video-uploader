@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 @SpringBootApplication
 @EnableJpaRepositories("br.com.postech.videoupload.infra.persistence")
 @EntityScan("br.com.postech.videoupload.infra.persistence.entity")
-open class VideoUploadApplication
+class VideoUploadApplication
 
 fun main(args: Array<String>) {
     runApplication<VideoUploadApplication>(*args)
