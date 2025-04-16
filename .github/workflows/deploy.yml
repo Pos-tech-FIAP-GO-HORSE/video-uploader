@@ -59,10 +59,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy Lambda Function
+      - name: Upload to S3
         run: |
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
-          echo "Deploying $JAR_FILE"
+          aws s3 cp $JAR_FILE s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
+
+      - name: Deploy Lambda Function from S3
+        run: |
+          JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
+          FILE_NAME=$(basename $JAR_FILE)
           aws lambda update-function-code \
             --function-name process-video-lambda \
-            --zip-file fileb://$JAR_FILE
+            --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
+            --s3-key lambda-artifacts/$FILE_NAME
