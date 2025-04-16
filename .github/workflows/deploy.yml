@@ -62,6 +62,14 @@ jobs:
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
           echo "jar=$JAR_FILE" >> $GITHUB_OUTPUT
 
+      - name: Instalar tree e listar diretórios
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tree
+          echo "Estrutura de pastas:"
+          tree /home/runner/work/
+    
+
       - name: Upload JAR para o S3
         run: |
           cd /home/runner/work/videoupload/videoupload/lambda

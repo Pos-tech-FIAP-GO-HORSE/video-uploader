@@ -10,7 +10,7 @@ import java.util.*
 
 class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
-    private val applicationContext = AnnotationConfigApplicationContext("br.com.postech.videouploade")
+    private val applicationContext = AnnotationConfigApplicationContext("br.com.postech.videoupload")
     private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
         applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
 
