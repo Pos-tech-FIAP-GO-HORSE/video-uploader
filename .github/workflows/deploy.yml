@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload JAR para o S3
         run: |
-          cd /home/runner/work/videoupload/videoupload/lambda
+          cd /home/runner/work/video-uploader/video-uploader/lambda-jar
           mkdir -p lambda-jar
           ./gradlew clean bootJar
           cp build/libs/*-plain.jar lambda-jar/
