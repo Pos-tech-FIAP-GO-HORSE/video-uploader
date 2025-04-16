@@ -52,7 +52,7 @@ jobs:
 
       - name: Cria bucket se não existir
         run: |
-          BUCKET_NAME=SEU_BUCKET_UNICO_AQUI
+          BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
           aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null || \
           aws s3api create-bucket --bucket "$BUCKET_NAME" --region us-east-1
 
@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload .jar para S3
         run: |
-          aws s3 cp "${{ steps.jar.outputs.jar }}" s3://SEU_BUCKET_UNICO_AQUI/lambda-artifacts/
+          aws s3 cp "${{ steps.jar.outputs.jar }}" s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
 
       - name: Atualizar função Lambda usando código do S3
         run: |
