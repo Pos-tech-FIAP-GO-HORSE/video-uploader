@@ -63,6 +63,7 @@ jobs:
           echo "jar=$JAR_FILE" >> $GITHUB_OUTPUT
 
       - name: Upload JAR para o S3
+        working-directory: lambda
         run: |
           mkdir -p lambda-jar
           ./gradlew clean bootJar
