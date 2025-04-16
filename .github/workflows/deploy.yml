@@ -62,13 +62,41 @@ jobs:
           JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
           echo "jar=$JAR_FILE" >> $GITHUB_OUTPUT
 
-      - name: Upload .jar para S3
+      - name: Upload JAR para o S3
         run: |
-          aws s3 cp "${{ steps.jar.outputs.jar }}" s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
+          mkdir -p lambda-jar
+          ./gradlew clean bootJar
+          cp build/libs/*-plain.jar lambda-jar/
+          JAR_FILE=$(ls lambda-jar/*.jar | head -n 1)
+          aws s3 cp "$JAR_FILE" s3://${{ secrets.S3_BUCKET_NAME }}/lambda-artifacts/
 
-      - name: Atualizar função Lambda usando código do S3
+      - name: Verifica se a função Lambda existe
+        id: check-lambda
+        run: |
+          set +e
+          aws lambda get-function --function-name process-video-lambda --region us-east-1 > /dev/null 2>&1
+          echo "exists=$?" >> $GITHUB_OUTPUT
+          set -e
+
+      - name: Cria função Lambda caso não exista
+        if: steps.check-lambda.outputs.exists != '0'
+        run: |
+          aws lambda create-function \
+            --function-name process-video-lambda \
+            --runtime java17 \
+            --role arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_S3_AND_LAMBDA_FULL}} \
+            --handler br.com.postech.videouploader.videoupload.lambda.LambdaHandler \
+            --code S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=lambda-artifacts/$(basename lambda-jar/*.jar) \
+            --timeout 30 \
+            --memory-size 1024 \
+            --region us-east-1
+
+      - name: Atualiza código da Lambda (se ela já existir)
+        if: steps.check-lambda.outputs.exists == '0'
         run: |
           aws lambda update-function-code \
             --function-name process-video-lambda \
             --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
-            --s3-key lambda-artifacts/$(basename "${{ steps.jar.outputs.jar }}")
+            --s3-key lambda-artifacts/$(basename lambda-jar/*.jar) \
+            --region us-east-1
+      
