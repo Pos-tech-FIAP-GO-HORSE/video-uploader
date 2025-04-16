@@ -91,7 +91,7 @@ jobs:
             --function-name process-video-lambda \
             --runtime java17 \
             --role arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_S3_AND_LAMBDA_FULL}} \
-            --handler br.com.postech.videouploader.videoupload.lambda.LambdaHandler \
+            --handler br.com.postech.videoupload.lambda.LambdaHandler \
             --code S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=lambda-artifacts/$(basename lambda-jar/*.jar) \
             --timeout 30 \
             --memory-size 1024 \
