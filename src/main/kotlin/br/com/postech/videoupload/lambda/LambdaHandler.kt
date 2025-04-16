@@ -1,6 +1,7 @@
 package br.com.postech.videoupload.lambda
 
 import br.com.postech.videoupload.application.usecase.ProcessAndUploadVideoUseCase
+import br.com.postech.videoupload.infra.config.AppConfig
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -11,7 +12,7 @@ import java.util.*
 
 class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
-    private val applicationContext = AnnotationConfigApplicationContext("br.com.postech.videoupload")
+    val applicationContext = AnnotationConfigApplicationContext(AppConfig::class.java)
     private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
         applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
 
