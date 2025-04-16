@@ -49,7 +49,7 @@ jobs:
 
       - name: Create PostgreSQL RDS Instance
         run: |
-          DB_INSTANCE_IDENTIFIER="my-postgres-db"
+          DB_INSTANCE_IDENTIFIER="mypostgresdb"
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
