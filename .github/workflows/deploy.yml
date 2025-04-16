@@ -65,6 +65,7 @@ jobs:
       - name: Upload JAR para o S3
         working-directory: lambda
         run: |
+          cd /home/runner/work/videouploader/videoupload/lambda
           mkdir -p lambda-jar
           ./gradlew clean bootJar
           cp build/libs/*-plain.jar lambda-jar/
