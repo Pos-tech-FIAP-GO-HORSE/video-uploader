@@ -7,6 +7,7 @@ on:
 
 env:
   STATEMENT_ID: sns-invoke-permission
+  AWS_REGION: us-east-1
 
 jobs:
   build:
@@ -195,6 +196,7 @@ jobs:
           echo ${{ secrets.AWS_ACCESS_KEY_ID }}
           echo ${{ secrets.AWS_REGION }}
           echo ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
