@@ -5,6 +5,13 @@ on:
     branches:
       - main
 
+env:
+  AWS_REGION: us-east-1
+  LAMBDA_FUNCTION_NAME: upload-video-lambda
+  ACCOUNT_ID: 123456789012
+  SNS_TOPIC_NAME: upload-video-topic
+  STATEMENT_ID: sns-invoke-permission
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -178,20 +185,36 @@ jobs:
             --environment Variables="{SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
             --region us-east-1
 
-      - name: Adicionar permissão para o SNS invocar a Lambda
+      
+
+
+
+  configure-sns-lambda:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Grant SNS permission to invoke Lambda
         run: |
           aws lambda add-permission \
-            --function-name upload-video-lambda \
-            --statement-id sns-invoke-permission \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --statement-id $STATEMENT_ID \
             --action lambda:InvokeFunction \
             --principal sns.amazonaws.com \
-            --source-arn ${{ secrets.SNS_TOPIC_ARN }} \
-            --region us-east-1 || echo "Permissão já existe ou falhou silenciosamente"
+            --source-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --region $AWS_REGION || echo "Permissão já existe ou falhou silenciosamente"
 
-      - name: Inscrever Lambda no tópico SNS
+      - name: Subscribe Lambda to SNS topic
         run: |
           aws sns subscribe \
-            --topic-arn ${{ secrets.SNS_TOPIC_ARN }} \
+            --topic-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:$SNS_TOPIC_NAME \
             --protocol lambda \
-            --notification-endpoint arn:aws:lambda:us-east-1:${{ secrets.AWS_USER_ID }}:function:upload-video-lambda \
-            --region us-east-1    
+            --notification-endpoint arn:aws:lambda:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:function:$LAMBDA_FUNCTION_NAME \
+            --region $AWS_REGION
