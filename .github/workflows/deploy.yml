@@ -6,10 +6,6 @@ on:
       - main
 
 env:
-  AWS_REGION: us-east-1
-  LAMBDA_FUNCTION_NAME: upload-video-lambda
-  ACCOUNT_ID: 123456789012
-  SNS_TOPIC_NAME: upload-video-topic
   STATEMENT_ID: sns-invoke-permission
 
 jobs:
@@ -204,18 +200,18 @@ jobs:
       - name: Grant SNS permission to invoke Lambda
         run: |
           aws lambda add-permission \
-            --function-name $LAMBDA_FUNCTION_NAME \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
             --statement-id $STATEMENT_ID \
             --action lambda:InvokeFunction \
             --principal sns.amazonaws.com \
-            --source-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
-            --region $AWS_REGION || echo "Permissão já existe ou falhou silenciosamente"
+            --source-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
+            --region ${{ secrets.AWS_REGION }} || echo "Permissão já existe ou falhou silenciosamente"
 
       - name: Subscribe Lambda to SNS topic
         run: |
-          echo ${{ secrets.AWS_USER_ID }}
+          echo ${{ secrets.SNS_TOPIC_NAME }}
           aws sns subscribe \
-            --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
             --protocol lambda \
-            --notification-endpoint arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:function:$LAMBDA_FUNCTION_NAME \
-            --region $AWS_REGION
+            --notification-endpoint arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:function:${{ env.LAMBDA_FUNCTION_NAME }} \
+            --region ${{ secrets.AWS_REGION }}
