@@ -199,7 +199,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Grant SNS permission to invoke Lambda
         run: |
@@ -208,14 +208,14 @@ jobs:
             --statement-id $STATEMENT_ID \
             --action lambda:InvokeFunction \
             --principal sns.amazonaws.com \
-            --source-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --source-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
             --region $AWS_REGION || echo "Permissão já existe ou falhou silenciosamente"
 
       - name: Subscribe Lambda to SNS topic
         run: |
-          echo ${{ env.AWS_USER_ID }}
+          echo ${{ secrets.AWS_USER_ID }}
           aws sns subscribe \
-            --topic-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
             --protocol lambda \
-            --notification-endpoint arn:aws:lambda:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:function:$LAMBDA_FUNCTION_NAME \
+            --notification-endpoint arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:function:$LAMBDA_FUNCTION_NAME \
             --region $AWS_REGION
