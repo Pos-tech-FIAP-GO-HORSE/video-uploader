@@ -164,6 +164,11 @@ jobs:
             --region us-east-1 \
             --environment Variables="{DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }}}"
 
+      - name: Esperar pela atualização da Lambda
+        run: |
+            echo "Aguardando a função Lambda ser atualizada..."
+            sleep 30  # Aguarda 30 segundos antes de tentar a próxima ação
+          
       - name: Atualiza código da Lambda (se ela já existir)
         if: steps.check-lambda.outputs.exists == '0'
         run: |
