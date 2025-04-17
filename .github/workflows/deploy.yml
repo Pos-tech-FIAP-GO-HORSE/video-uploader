@@ -203,17 +203,17 @@ jobs:
       - name: Grant SNS permission to invoke Lambda
         run: |
           aws lambda add-permission \
-            --function-name $LAMBDA_FUNCTION_NAME \
+            --function-name upload-video-lambda \
             --statement-id $STATEMENT_ID \
             --action lambda:InvokeFunction \
             --principal sns.amazonaws.com \
-            --source-arn arn:aws:sns:us-east-1:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --source-arn arn:aws:sns:us-east-1:${{ secrets.AWS_USER_ID }}:upload-video-topic \
             --region us-east-1 || echo "Permissão já existe ou falhou silenciosamente"
 
       - name: Subscribe Lambda to SNS topic
         run: |
           aws sns subscribe \
-            --topic-arn arn:aws:sns:us-east-1:${{ secrets.AWS_USER_ID }}:$SNS_TOPIC_NAME \
+            --topic-arn arn:aws:sns:us-east-1:${{ secrets.AWS_USER_ID }}:upload-video-topic \
             --protocol lambda \
-            --notification-endpoint arn:aws:lambda:us-east-1:${{ secrets.AWS_USER_ID }}:function:$LAMBDA_FUNCTION_NAME \
+            --notification-endpoint arn:aws:lambda:us-east-1:${{ secrets.AWS_USER_ID }}:function:upload-video-lambda \
             --region us-east-1
