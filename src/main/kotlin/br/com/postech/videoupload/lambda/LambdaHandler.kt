@@ -8,6 +8,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.EnableAspectJAutoProxy
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
@@ -21,6 +23,9 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
     private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
         applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
+
+    private val snsClient: SnsClient = SnsClient.builder().build()
+    private val snsTopicArn = "arn:aws:sns:us-east-1:852121054528:video-process-trigger"
 
     override fun handleRequest(input: Map<String, Any>, context: Context): String {
         val userId = input["userId"] as? String ?: throw IllegalArgumentException("userId is required")
@@ -42,6 +47,21 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
             filePath = tempFile.absolutePath,
             createdAt = createdAt
         )
+
+        // 🎯 Publicar no SNS após upload
+        val messageJson = """
+            {
+              "s3Url": "$s3Url",
+              "userId": "$userId"
+            }
+        """.trimIndent()
+
+        val publishRequest = PublishRequest.builder()
+            .topicArn(snsTopicArn)
+            .message(messageJson)
+            .build()
+
+        snsClient.publish(publishRequest)
 
         return "Video uploaded successfully: $s3Url"
     }

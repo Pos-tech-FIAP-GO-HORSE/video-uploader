@@ -23,7 +23,10 @@ repositories {
 dependencies {
     implementation("com.amazonaws:aws-lambda-java-core:1.2.2")
     implementation("com.amazonaws:aws-lambda-java-events:3.11.0")
+
     implementation("software.amazon.awssdk:s3:2.20.0") // AWS SDK para S3
+    implementation("software.amazon.awssdk:sns:2.25.15")
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") // Para persistência no banco de dados
@@ -36,6 +39,7 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0") // Mockito para Kotlin
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0") // JUnit 5 para testes unitários
     testImplementation("org.springframework:spring-test") // Suporte para testes Spring
+
 }
 
 springBoot {
