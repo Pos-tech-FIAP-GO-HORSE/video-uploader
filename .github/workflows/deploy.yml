@@ -191,18 +191,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: test secrets e envs
-        run: | 
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }}
-          echo ${{ secrets.AWS_REGION }}
-          echo ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: $AWS_REGION
 
       - name: Grant SNS permission to invoke Lambda
         run: |
@@ -211,14 +205,13 @@ jobs:
             --statement-id $STATEMENT_ID \
             --action lambda:InvokeFunction \
             --principal sns.amazonaws.com \
-            --source-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
-            --region ${{ secrets.AWS_REGION }} || echo "Permissão já existe ou falhou silenciosamente"
+            --source-arn arn:aws:sns:$AWS_REGION:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
+            --region $AWS_REGION || echo "Permissão já existe ou falhou silenciosamente"
 
       - name: Subscribe Lambda to SNS topic
         run: |
-          echo ${{ secrets.SNS_TOPIC_NAME }}
           aws sns subscribe \
-            --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
+            --topic-arn arn:aws:sns:$AWS_REGION:${{ secrets.AWS_USER_ID }}:${{ env.SNS_TOPIC_NAME }} \
             --protocol lambda \
-            --notification-endpoint arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_USER_ID }}:function:${{ env.LAMBDA_FUNCTION_NAME }} \
-            --region ${{ secrets.AWS_REGION }}
+            --notification-endpoint arn:aws:lambda:$AWS_REGION:${{ secrets.AWS_USER_ID }}:function:${{ env.LAMBDA_FUNCTION_NAME }} \
+            --region $AWS_REGION
