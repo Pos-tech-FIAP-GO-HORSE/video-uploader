@@ -213,6 +213,7 @@ jobs:
 
       - name: Subscribe Lambda to SNS topic
         run: |
+          echo ${{ env.AWS_USER_ID }}
           aws sns subscribe \
             --topic-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ env.AWS_USER_ID }}:$SNS_TOPIC_NAME \
             --protocol lambda \
