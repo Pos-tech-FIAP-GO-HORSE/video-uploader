@@ -162,7 +162,7 @@ jobs:
             --timeout 30 \
             --memory-size 1024 \
             --region us-east-1 \
-            --environment Variables="{DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
+            --environment Variables="{SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
 
       - name: Atualiza código da Lambda (se ela já existir)
         if: steps.check-lambda.outputs.exists == '0'
@@ -175,5 +175,23 @@ jobs:
 
           aws lambda update-function-configuration \
             --function-name upload-video-lambda \
-            --environment Variables="{DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
+            --environment Variables="{SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
             --region us-east-1
+
+      - name: Adicionar permissão para o SNS invocar a Lambda
+        run: |
+          aws lambda add-permission \
+            --function-name upload-video-lambda \
+            --statement-id sns-invoke-permission \
+            --action lambda:InvokeFunction \
+            --principal sns.amazonaws.com \
+            --source-arn ${{ secrets.SNS_TOPIC_ARN }} \
+            --region us-east-1 || echo "Permissão já existe ou falhou silenciosamente"
+
+      - name: Inscrever Lambda no tópico SNS
+        run: |
+          aws sns subscribe \
+            --topic-arn ${{ secrets.SNS_TOPIC_ARN }} \
+            --protocol lambda \
+            --notification-endpoint arn:aws:lambda:us-east-1:${{ secrets.AWS_USER_ID }}:function:upload-video-lambda \
+            --region us-east-1    
