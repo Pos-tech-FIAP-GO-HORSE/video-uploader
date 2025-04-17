@@ -50,14 +50,17 @@ jobs:
       - name: Create PostgreSQL RDS Instance
         run: |
           DB_INSTANCE_IDENTIFIER="mypostgresdb"
-          DB_NAME=${{ secrets.DB_NAME }}
-          DB_USER=${{ secrets.DB_USER }}
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME="${{ secrets.DB_NAME }}"
+          DB_USER="${{ secrets.DB_USER }}"
+          DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
           DB_INSTANCE_CLASS="db.t3.micro"
           DB_ENGINE="postgres"
           DB_PORT=5432
           VPC_SECURITY_GROUP="sg-0ca4bdbfb3154b655"
 
+          echo "Tentando criar a instância RDS..."
+
+          set +e
           aws rds create-db-instance \
             --db-instance-identifier $DB_INSTANCE_IDENTIFIER \
             --allocated-storage 20 \
@@ -70,7 +73,17 @@ jobs:
             --port $DB_PORT \
             --backup-retention-period 7 \
             --publicly-accessible \
-            --region us-east-1
+            --region us-east-1 2> error.log
+          EXIT_CODE=$?
+          set -e
+
+          if grep -q "DBInstanceAlreadyExists" error.log; then
+            echo "A instância já existe. Continuando..."
+          elif [ $EXIT_CODE -ne 0 ]; then
+            echo "Erro ao criar a instância RDS:"
+            cat error.log
+            exit $EXIT_CODE
+          fi
 
       - name: Espera até a instância RDS estar disponível
         run: |
