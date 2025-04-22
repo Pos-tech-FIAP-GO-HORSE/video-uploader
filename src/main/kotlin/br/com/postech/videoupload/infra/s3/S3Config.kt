@@ -16,6 +16,10 @@ class S3Config {
         val secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
         val region = System.getenv("AWS_REGION") ?: "sa-east-1"
 
+        println("Log s3 " + accessKey)
+        println("Log s3 " + secretKey)
+        println("Log s3 " + region)
+
         return S3Client.builder()
             .region(Region.of(region))
             .credentialsProvider(
