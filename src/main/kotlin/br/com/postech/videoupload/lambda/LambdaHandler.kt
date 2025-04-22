@@ -1,9 +1,11 @@
 package br.com.postech.videoupload.lambda
 
+import br.com.postech.videoupload.VideoUploadApplication
 import br.com.postech.videoupload.application.usecase.ProcessAndUploadVideoUseCase
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import org.slf4j.LoggerFactory
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
@@ -21,6 +23,14 @@ import java.util.*
 @ComponentScan(basePackages = ["br.com.postech.videoupload"])
 @EnableAspectJAutoProxy(proxyTargetClass = false)
 class LambdaHandler : RequestHandler<Map<String, Any>, String> {
+
+    private val context: ApplicationContext by lazy {
+        SpringApplication.run(VideoUploadApplication::class.java)
+    }
+
+    private val useCase: ProcessAndUploadVideoUseCase by lazy {
+        context.getBean(ProcessAndUploadVideoUseCase::class.java)
+    }
 
     override fun handleRequest(input: Map<String, Any>, context: Context): String {
         val logger = LoggerFactory.getLogger(LambdaHandler::class.java)
@@ -41,7 +51,7 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
         return try {
             tempFile.writeBytes(bytes)
 
-            val s3Url = processAndUploadVideoUseCase.execute(
+            val s3Url = useCase.execute(
                 userId = UUID.fromString(userId),
                 title = title,
                 description = description,
@@ -66,9 +76,6 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     }
 
     companion object {
-        private val applicationContext: ApplicationContext = SpringApplicationBuilder(LambdaHandler::class.java).run()
-        private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
-            applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
         private val snsClient: SnsClient = SnsClient.builder().build()
         private const val snsTopicArn = "arn:aws:sns:us-east-1:852121054528:video-process-trigger"
     }
