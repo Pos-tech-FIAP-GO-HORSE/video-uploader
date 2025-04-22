@@ -156,6 +156,20 @@ jobs:
           echo "exists=$?" >> $GITHUB_OUTPUT
           set -e
 
+      - name: Atualiza código da Lambda
+        if: steps.check-lambda.outputs.exists == '0'
+        run: |
+          aws lambda update-function-code \
+            --function-name upload-video-lambda \
+            --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
+            --s3-key lambda-artifacts/$(basename lambda-jar/*.jar) \
+            --region us-east-1
+
+          aws lambda update-function-configuration \
+            --function-name upload-video-lambda \
+            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
+            --region us-east-1
+
       - name: Cria função Lambda caso não exista
         if: steps.check-lambda.outputs.exists != '0'
         run: |
@@ -169,20 +183,6 @@ jobs:
             --memory-size 1024 \
             --region us-east-1 \
             --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
-
-      - name: Atualiza código da Lambda (se ela já existir)
-        if: steps.check-lambda.outputs.exists == '0'
-        run: |
-          aws lambda update-function-code \
-            --function-name upload-video-lambda \
-            --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
-            --s3-key lambda-artifacts/$(basename lambda-jar/*.jar) \
-            --region us-east-1
-
-          aws lambda update-function-configuration \
-            --function-name upload-video-lambda \
-            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
-            --region us-east-1
 
   configure-sns-lambda:
     needs: deploy
