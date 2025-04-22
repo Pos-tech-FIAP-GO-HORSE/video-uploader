@@ -179,7 +179,7 @@ jobs:
             --role arn:aws:iam::${{ secrets.AWS_USER_ID }}:role/${{ secrets.AWS_ROLE_S3_AND_LAMBDA_FULL}} \
             --handler br.com.postech.videoupload.lambda.LambdaHandler \
             --code S3Bucket=${{ secrets.S3_BUCKET_NAME }},S3Key=lambda-artifacts/$(basename lambda-jar/*.jar) \
-            --timeout 30 \
+            --timeout 180 \
             --memory-size 1024 \
             --region us-east-1 \
             --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
