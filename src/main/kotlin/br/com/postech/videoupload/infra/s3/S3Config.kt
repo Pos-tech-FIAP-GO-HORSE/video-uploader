@@ -8,6 +8,26 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 
 @Configuration
+class S3Config {
+
+    @Bean
+    fun s3Client(): S3Client {
+        val accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+        val secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
+        val region = System.getenv("AWS_REGION") ?: "sa-east-1"
+
+        return S3Client.builder()
+            .region(Region.of(region))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(accessKey, secretKey)
+                )
+            )
+            .build()
+    }
+}
+
+/*@Configuration
 open class S3Config(
     private val s3Properties: S3Properties
 ) {
@@ -24,4 +44,4 @@ open class S3Config(
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .build()
     }
-}
+}*/
