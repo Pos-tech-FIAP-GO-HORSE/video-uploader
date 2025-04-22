@@ -33,7 +33,7 @@ class ProcessAndUploadVideoService(
         videoRepository.save(video)
 
         // 2. Fazer o upload do arquivo para o S3
-        val s3Url = s3Uploader.upload(filePath, "videos/${video.id}.mp4")
+        val s3Url = s3Uploader.upload(filePath, "${video.id}.mp4")
 
         // 3. Atualizar o vídeo com a URL do S3
         val updatedVideo = video.copy(url = s3Url)
