@@ -16,7 +16,7 @@ class VideoRepositoryImpl(
             id = video.id,
             title = video.title,
             description = video.description,
-            url = video.url,
+            url = video.url.orEmpty(),
             createdAt = video.createdAt,
             userId = video.userId
         )

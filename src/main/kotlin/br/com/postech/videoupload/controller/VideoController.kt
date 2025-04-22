@@ -13,7 +13,7 @@ class VideoController(
     private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase
 ) {
 
-    @PostMapping("/{videoId}/upload")
+    @PostMapping("/upload")
     fun uploadVideo(
         @RequestParam("file") file: MultipartFile,
         @RequestParam("title") title: String,

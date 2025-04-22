@@ -3,66 +3,77 @@ package br.com.postech.videoupload.lambda
 import br.com.postech.videoupload.application.usecase.ProcessAndUploadVideoUseCase
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.context.annotation.Profile
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
 
+@Profile("lambda")
 @SpringBootApplication
 @ComponentScan(basePackages = ["br.com.postech.videoupload"])
-@EnableAspectJAutoProxy(proxyTargetClass = false) // Se você estiver usando AOP
+@EnableAspectJAutoProxy(proxyTargetClass = false)
 class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
-    private val applicationContext: ApplicationContext = SpringApplicationBuilder(LambdaHandler::class.java).run()
-
-    private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
-        applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
-
-    private val snsClient: SnsClient = SnsClient.builder().build()
-    private val snsTopicArn = "arn:aws:sns:us-east-1:852121054528:video-process-trigger"
-
     override fun handleRequest(input: Map<String, Any>, context: Context): String {
-        val userId = input["userId"] as? String ?: throw IllegalArgumentException("userId is required")
-        val title = input["title"] as? String ?: throw IllegalArgumentException("title is required")
-        val description = input["description"] as? String ?: throw IllegalArgumentException("description is required")
-        val fileBase64 = input["fileBase64"] as? String ?: throw IllegalArgumentException("fileBase64 is required")
+        val logger = LoggerFactory.getLogger(LambdaHandler::class.java)
 
-        // Decode base64 e salva em arquivo temporário
-        val bytes = Base64.getDecoder().decode(fileBase64)
+        val userId = input.requireString("userId")
+        val title = input.requireString("title")
+        val description = input.requireString("description")
+        val fileBase64 = input.requireString("fileBase64")
+
+        val bytes = try {
+            Base64.getDecoder().decode(fileBase64)
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("fileBase64 is not valid Base64")
+        }
+
         val tempFile = Files.createTempFile("video_", ".mp4").toFile()
-        tempFile.writeBytes(bytes)
 
-        val createdAt = LocalDateTime.now()
+        return try {
+            tempFile.writeBytes(bytes)
 
-        val s3Url = processAndUploadVideoUseCase.execute(
-            userId = UUID.fromString(userId),
-            title = title,
-            description = description,
-            filePath = tempFile.absolutePath,
-            createdAt = createdAt
-        )
+            val s3Url = processAndUploadVideoUseCase.execute(
+                userId = UUID.fromString(userId),
+                title = title,
+                description = description,
+                filePath = tempFile.absolutePath,
+                createdAt = LocalDateTime.now()
+            )
 
-        // 🎯 Publicar no SNS após upload
-        val messageJson = """
-            {
-              "s3Url": "$s3Url",
-              "userId": "$userId"
-            }
-        """.trimIndent()
+            val messageJson = """{"s3Url": "$s3Url", "userId": "$userId"}"""
 
-        val publishRequest = PublishRequest.builder()
-            .topicArn(snsTopicArn)
-            .message(messageJson)
-            .build()
+            val publishRequest = PublishRequest.builder()
+                .topicArn(snsTopicArn)
+                .message(messageJson)
+                .build()
 
-        snsClient.publish(publishRequest)
+            snsClient.publish(publishRequest)
 
-        return "Video uploaded successfully: $s3Url"
+            logger.info("Video uploaded and message published for userId=$userId")
+            "Video uploaded successfully: $s3Url"
+        } finally {
+            tempFile.delete()
+        }
+    }
+
+    companion object {
+        private val applicationContext: ApplicationContext = SpringApplicationBuilder(LambdaHandler::class.java).run()
+        private val processAndUploadVideoUseCase: ProcessAndUploadVideoUseCase =
+            applicationContext.getBean(ProcessAndUploadVideoUseCase::class.java)
+        private val snsClient: SnsClient = SnsClient.builder().build()
+        private const val snsTopicArn = "arn:aws:sns:us-east-1:852121054528:video-process-trigger"
     }
 }
+
+// Extension function para simplificar extração de dados obrigatórios
+private fun Map<String, Any>.requireString(key: String): String =
+    this[key] as? String ?: throw IllegalArgumentException("$key is required and must be a string")

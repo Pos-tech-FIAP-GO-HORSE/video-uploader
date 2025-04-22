@@ -11,17 +11,17 @@ import java.util.*
 @Table(name = "videos")
 data class VideoEntity(
     @Id
-    val id: UUID = UUID.randomUUID(),
-
+    val id: UUID,
     val title: String,
-
     val description: String,
-
-    val url: String? = null,
-
-    @Column(name = "created_at")
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-
+    val url: String,
     @Column(name = "user_id")
-    val userId: UUID
-)
+    val userId: UUID,
+    @Column(name = "created_at")
+    val createdAt: LocalDateTime
+) {
+    // Construtor padrão exigido pelo Hibernate
+    constructor() : this(
+        UUID.randomUUID(), "", "", "", UUID.randomUUID(), LocalDateTime.now()
+    )
+}
