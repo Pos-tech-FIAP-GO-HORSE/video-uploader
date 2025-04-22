@@ -168,7 +168,7 @@ jobs:
             --timeout 30 \
             --memory-size 1024 \
             --region us-east-1 \
-            --environment Variables="{SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
+            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
 
       - name: Atualiza código da Lambda (se ela já existir)
         if: steps.check-lambda.outputs.exists == '0'
@@ -181,7 +181,7 @@ jobs:
 
           aws lambda update-function-configuration \
             --function-name upload-video-lambda \
-            --environment Variables="{SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
+            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
             --region us-east-1
 
   configure-sns-lambda:
