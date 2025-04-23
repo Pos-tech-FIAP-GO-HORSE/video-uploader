@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
@@ -19,6 +20,7 @@ import software.amazon.awssdk.services.sns.model.PublishRequest
 import java.nio.file.Files
 import java.time.LocalDateTime
 import java.util.*
+import javax.crypto.spec.SecretKeySpec
 
 @Profile("lambda")
 @SpringBootApplication
@@ -91,15 +93,20 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     }
 
     private fun extractUserIdFromToken(token: String): String {
-        val secretKey = Keys.hmacShaKeyFor(System.getenv("JWT_SECRET_KEY").toByteArray())
+        val secret = System.getenv("JWT_SECRET_KEY") ?: throw IllegalArgumentException("JWT_SECRET_KEY not set")
+
+        val keyBytes = secret.toByteArray(Charsets.UTF_8)
+        val hmacKey = SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.jcaName)
+
         val claims: Claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey)
+            .setSigningKey(hmacKey)
             .build()
             .parseClaimsJws(token)
             .body
 
-        return claims["user_id"]?.toString() ?: throw IllegalArgumentException("Token inválido: user_id ausente")
+        return claims["user_id"] as? String ?: throw IllegalArgumentException("user_id not found in token")
     }
+
 
     companion object {
         private val snsClient: SnsClient = SnsClient.builder().build()
