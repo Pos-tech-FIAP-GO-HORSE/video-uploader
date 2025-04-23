@@ -65,7 +65,16 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
                 createdAt = LocalDateTime.now()
             )
 
-            val messageJson = """{"s3Url": "$s3Url", "userId": "$userId"}"""
+            val videoKey = s3Url.substringAfterLast("/")
+
+            val messageJson = """
+                {
+                    "video_key": "$videoKey",
+                    "s3Url": "$s3Url",
+                    "user_email": "postechfiap7@gmail.com",
+                    "user_id": "$userId"
+                }
+            """.trimIndent()
 
             val publishRequest = PublishRequest.builder()
                 .topicArn(snsTopicArn)
@@ -74,7 +83,7 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
             snsClient.publish(publishRequest)
 
-            logger.info("Video uploaded and message published for userId=$userId")
+            logger.info("Video uploaded and message published for userId=$userId, videoKey=$videoKey")
             "Video uploaded successfully: $s3Url"
         } finally {
             tempFile.delete()
