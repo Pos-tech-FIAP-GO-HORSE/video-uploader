@@ -92,7 +92,7 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
 
     private fun extractUserIdFromToken(token: String): String {
         val claims: Claims = Jwts.parserBuilder()
-            .setSigningKey(System.getenv("JWT_SECRET").toByteArray())
+            .setSigningKey(System.getenv("JWT_SECRET_KEY").toByteArray())
             .build()
             .parseClaimsJws(token)
             .body
