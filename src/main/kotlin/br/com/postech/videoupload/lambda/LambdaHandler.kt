@@ -98,9 +98,8 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
         val keyBytes = secret.toByteArray(Charsets.UTF_8)
         val hmacKey = SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.jcaName)
 
-        val claims: Claims = Jwts.parserBuilder()
+        val claims: Claims = Jwts.parser()
             .setSigningKey(hmacKey)
-            .build()
             .parseClaimsJws(token)
             .body
 

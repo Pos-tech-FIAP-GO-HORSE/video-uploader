@@ -40,9 +40,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0") // JUnit 5 para testes unitários
     testImplementation("org.springframework:spring-test") // Suporte para testes Spring
 
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-api:0.10.7")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.7")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.7")
 
 }
 
