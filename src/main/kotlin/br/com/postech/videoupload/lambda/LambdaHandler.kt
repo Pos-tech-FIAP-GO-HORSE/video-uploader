@@ -71,7 +71,6 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
             val messageJson = """
                 {
                     "video_key": "$videoKey",
-                    "s3Url": "$s3Url",
                     "user_email": "postechfiap7@gmail.com",
                     "user_id": "$userId"
                 }
@@ -92,16 +91,14 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     }
 
     private fun extractUserIdFromToken(token: String): String {
-        val secret = System.getenv("JWT_SECRET_KEY")?.toByteArray()
-            ?: throw IllegalArgumentException("JWT_SECRET_KEY environment variable not set")
-
+        val secretKey = Keys.hmacShaKeyFor(System.getenv("JWT_SECRET_KEY").toByteArray())
         val claims: Claims = Jwts.parserBuilder()
-            .setSigningKey(Keys.hmacShaKeyFor(secret))
+            .setSigningKey(secretKey)
             .build()
             .parseClaimsJws(token)
             .body
 
-        return claims["user_id"] as? String ?: throw IllegalArgumentException("Token inválido: user_id ausente")
+        return claims["user_id"]?.toString() ?: throw IllegalArgumentException("Token inválido: user_id ausente")
     }
 
     companion object {
