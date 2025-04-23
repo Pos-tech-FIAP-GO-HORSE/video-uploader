@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -91,13 +92,16 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     }
 
     private fun extractUserIdFromToken(token: String): String {
+        val secret = System.getenv("JWT_SECRET_KEY")?.toByteArray()
+            ?: throw IllegalArgumentException("JWT_SECRET_KEY environment variable not set")
+
         val claims: Claims = Jwts.parserBuilder()
-            .setSigningKey(System.getenv("JWT_SECRET_KEY").toByteArray())
+            .setSigningKey(Keys.hmacShaKeyFor(secret))
             .build()
             .parseClaimsJws(token)
             .body
 
-        return claims.subject ?: throw IllegalArgumentException("Token inválido: subject ausente")
+        return claims["user_id"] as? String ?: throw IllegalArgumentException("Token inválido: user_id ausente")
     }
 
     companion object {
