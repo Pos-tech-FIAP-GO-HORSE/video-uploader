@@ -167,7 +167,7 @@ jobs:
 
           aws lambda update-function-configuration \
             --function-name upload-video-lambda \
-            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
+            --environment Variables="{JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }},S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}" \
             --region us-east-1
 
       - name: Cria função Lambda caso não exista
@@ -182,7 +182,7 @@ jobs:
             --timeout 180 \
             --memory-size 1024 \
             --region us-east-1 \
-            --environment Variables="{S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
+            --environment Variables="{JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }},S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }},SNS_TOPIC_ARN=${{ secrets.SNS_TOPIC_ARN }},DB_HOST=${{ needs.create-rds.outputs.db-host }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }}}"
 
   configure-sns-lambda:
     needs: deploy

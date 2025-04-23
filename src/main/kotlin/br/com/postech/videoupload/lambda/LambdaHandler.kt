@@ -4,10 +4,11 @@ import br.com.postech.videoupload.VideoUploadApplication
 import br.com.postech.videoupload.application.usecase.ProcessAndUploadVideoUseCase
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.EnableAspectJAutoProxy
@@ -35,7 +36,12 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     override fun handleRequest(input: Map<String, Any>, context: Context): String {
         val logger = LoggerFactory.getLogger(LambdaHandler::class.java)
 
-        val userId = input.requireString("userId")
+        val headers = input["headers"] as? Map<*, *> ?: throw IllegalArgumentException("Missing headers")
+        val authHeader = headers["Authorization"] as? String ?: throw IllegalArgumentException("Missing Authorization header")
+
+        val token = authHeader.removePrefix("Bearer ").trim()
+        val userId = extractUserIdFromToken(token)
+
         val title = input.requireString("title")
         val description = input.requireString("description")
         val fileBase64 = input.requireString("fileBase64")
@@ -73,6 +79,16 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
         } finally {
             tempFile.delete()
         }
+    }
+
+    private fun extractUserIdFromToken(token: String): String {
+        val claims: Claims = Jwts.parserBuilder()
+            .setSigningKey(System.getenv("JWT_SECRET").toByteArray())
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        return claims.subject ?: throw IllegalArgumentException("Token inválido: subject ausente")
     }
 
     companion object {
