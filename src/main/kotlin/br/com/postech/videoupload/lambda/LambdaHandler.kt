@@ -39,13 +39,14 @@ class LambdaHandler : RequestHandler<Map<String, Any>, String> {
     override fun handleRequest(input: Map<String, Any>, context: Context): String {
         val logger = LoggerFactory.getLogger(LambdaHandler::class.java)
 
-        val headers = input["headers"] as? Map<*, *> ?: throw IllegalArgumentException("Missing headers")
+        /*val headers = input["headers"] as? Map<*, *> ?: throw IllegalArgumentException("Missing headers")
         val authHeader = headers["Authorization"] as? String ?: throw IllegalArgumentException("Missing Authorization header")
 
         val token = authHeader.removePrefix("Bearer ").trim()
-        val userId = extractUserIdFromToken(token)
+        val userId = extractUserIdFromToken(token)*/
 
         val title = input.requireString("title")
+        val userId = input.requireString("userId")
         val description = input.requireString("description")
         val fileBase64 = input.requireString("fileBase64")
 
