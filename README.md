@@ -5,7 +5,7 @@ Microserviço responsável por gerenciar o upload de vídeos, incluindo validaç
 Este projeto foi desenvolvido com Kotlin e Spring Boot.
 
 ## Video com explicação
-https://www.youtube.com/watch?v=9fGMerZ8gRs
+https://www.youtube.com/watch?v=AlIQDMKciPo
 
 ---
 
